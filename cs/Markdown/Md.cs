@@ -1,36 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Markdown.MarkdownRenders;
-using Markdown.Parsers;
-using Markdown.TokenizerClasses;
-using Markdown.TokenizerClasses.ConcreteTokenizers;
+﻿using Markdown.Converter;
+using Markdown.Extensions;
+using Markdown.TokenParser;
 
 namespace Markdown
 {
     public class Md
     {
-        private readonly IMarkdownParser markdownParser;
+        private readonly ILineParser markdownTokenizer;
 
-        private readonly ITokenizer markdownTokenizer;
+        private readonly IConverter converter;
 
-        private readonly IMarkdownRender render;
-
-        public Md(IMarkdownParser parser, ITokenizer tokenizer, IMarkdownRender render)
+        public Md(ILineParser tokenizer, IConverter converter)
         {
-            markdownParser = parser;
             markdownTokenizer = tokenizer;
-            this.render = render;
+            this.converter = converter;
         }
 
-        public string Render(string text)
+        public string Render(string mdString)
         {
-            var tokens = markdownTokenizer.Tokenize(text);
-            var rootNode = markdownParser.Parse(tokens);
-
-            return render.Render(rootNode);
+            return converter.Convert(mdString.SplitIntoLines()
+                .Select(markdownTokenizer.ParseLine)
+                .ToArray());
         }
     }
 }

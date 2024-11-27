@@ -1,41 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Markdown.Tags.ConcreteTags;
-
-namespace Markdown.Tags
+﻿namespace Markdown.Tags
 {
     public abstract class Tag
     {
-        public bool IsCompleted { get; set; }
+        public TagType TagType { get; }
+        public int Position { get; }
+        public bool IsCloseTag { get; }
 
-        public bool SelfCompeted { get; protected set; }
-
-        public TagType TagType { get; protected set; }
-
-        public readonly string Content;
-
-        public readonly int level;
-
-        public Tag(TagType tagType, string content, bool selfCompleted, int level = 0)
+        public Tag(TagType tagType, int position, bool isCloseTag)
         {
             TagType = tagType;
-            Content = content;
-            this.level = level;
-            Content = string.Empty;
-
-            SelfCompeted = selfCompleted;
-            IsCompleted = false;
-        }
-
-        public Tag CheckCompleted()
-        {
-            if (IsCompleted || SelfCompeted)
-                return this;
-
-            return new TextTag(this.Content);
+            Position = position;
+            IsCloseTag = isCloseTag;
         }
     }
 }
