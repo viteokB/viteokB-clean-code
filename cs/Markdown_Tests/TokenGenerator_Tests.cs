@@ -36,8 +36,7 @@ namespace MarkdownTests
 
             actuallyTokens.Should().BeEquivalentTo(new List<Token>()
             {
-                new Token(TokenType.MdTag, "# ", TagType.Header)
-
+                new Token(TokenType.MdTag, "# ", TagType.Header, true)
             });
         }
 

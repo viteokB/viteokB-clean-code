@@ -6,11 +6,17 @@ namespace Markdown
     {
         public readonly string Line;
 
-        public readonly List<Tag> Tags;
+        public readonly List<ITag> Tags;
 
-        public ParsedLine(string line, List<Tag> tags)
+        public ParsedLine(string line, List<ITag> tags)
         {
-            throw new NotImplementedException();
+            var sortedTags = tags.OrderBy(x => x.Position).ToList();
+
+            if (sortedTags.Any(x => x.Position > line.Length))
+                throw new ArgumentException("Позиция тега не может быть больше длины строки", nameof(sortedTags));
+
+            this.Line = line;
+            this.Tags = sortedTags;
         }
     }
 }

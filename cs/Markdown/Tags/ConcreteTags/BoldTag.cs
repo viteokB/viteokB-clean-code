@@ -1,9 +1,23 @@
 ﻿namespace Markdown.Tags.ConcreteTags
 {
-    public class BoldTag : Tag
+    public class BoldTag : ITag
     {
-        public BoldTag(int position, bool isCloseTag) : base(TagType.Bold, position, isCloseTag)
+        public TagType TagType => TagType.Bold;
+
+        public int Position { get; set; }
+
+        public bool IsCloseTag { get; set; }
+
+        public bool IsAutoClosing => false;
+
+        public string OpenTag => "<strong>";
+
+        public string CloseTag => "</strong>";
+
+        public BoldTag(int position, bool isCloseTag)
         {
+            Position = position;
+            IsCloseTag = isCloseTag;
         }
     }
 }

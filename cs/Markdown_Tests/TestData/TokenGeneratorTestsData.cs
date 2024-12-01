@@ -58,22 +58,22 @@ namespace MarkdownTests.TestData
         {
             yield return new TestCaseData("# Заголовок", new List<Token>()
             {
-                new Token(TokenType.MdTag, "# ", TagType.Header),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
                 new Token(TokenType.Text, "Заголовок", TagType.UnDefined),
             });
 
             yield return new TestCaseData("# # # ", new List<Token>()
             {
-                new Token(TokenType.MdTag, "# ", TagType.Header),
-                new Token(TokenType.MdTag, "# ", TagType.Header),
-                new Token(TokenType.MdTag, "# ", TagType.Header)
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true)
             });
 
             yield return new TestCaseData(@" # # ", new List<Token>()
             {
                 new Token(TokenType.WhiteSpace, " ", TagType.UnDefined),
-                new Token(TokenType.MdTag, "# ", TagType.Header),
-                new Token(TokenType.MdTag, "# ", TagType.Header),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
             });
         }
 
@@ -133,13 +133,13 @@ namespace MarkdownTests.TestData
                 new Token(TokenType.WhiteSpace, " ", TagType.UnDefined),
                 new Token(TokenType.MdTag, "_", TagType.Italic),
                 new Token(TokenType.WhiteSpace, " ", TagType.UnDefined),
-                new Token(TokenType.MdTag, "# ", TagType.Header),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
             });
 
             yield return new TestCaseData("__# _", new List<Token>()
             {
                 new Token(TokenType.MdTag, "__", TagType.Bold),
-                new Token(TokenType.MdTag, "# ", TagType.Header),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
                 new Token(TokenType.MdTag, "_", TagType.Italic),
             });
 
@@ -155,7 +155,7 @@ namespace MarkdownTests.TestData
             yield return new TestCaseData(@"\# word", new List<Token>()
             {
                 new Token(TokenType.Escape, @"\", TagType.Escape),
-                new Token(TokenType.MdTag, "# ", TagType.Header),
+                new Token(TokenType.MdTag, "# ", TagType.Header, true),
                 new Token(TokenType.Text, "word", TagType.UnDefined),
             });
         }

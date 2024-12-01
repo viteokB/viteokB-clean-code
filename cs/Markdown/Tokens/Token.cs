@@ -12,13 +12,17 @@ namespace Markdown.Tokens
 
         public bool IsCloseTag;
 
+        public bool IsSelfCosingTag;
+
         public int PairTagPosition;
 
-        public Token(TokenType tokenType, string content, TagType tagType = TagType.UnDefined)
+        public Token(TokenType tokenType, string content, TagType tagType = TagType.UnDefined, bool isSelfClosing = false)
         {
             TokenType = tokenType;
             Content = content;
             TagType = tagType;
+
+            IsSelfCosingTag = isSelfClosing;
         }
     }
 }
