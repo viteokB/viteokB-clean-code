@@ -20,6 +20,22 @@ namespace Markdown.TokenParser.Helpers
             }
         }
 
+        private static bool lastOpenWasInWord;
+        
+        public static bool IsTokenTagClosed(TagType tagType, List<Token> tokens, int index)
+        {
+            switch (tagType)
+            {
+                case TagType.Italic:
+                    return IsBoldOrItalicClosed(tokens, index);
+                case TagType.Bold:
+                    return IsBoldOrItalicClosed(tokens, index);
+                case TagType.Header:
+                default:
+                    return true;
+            }
+        }
+
         public static bool IsValidTagToken(List<Token> tokens, int index)
         {
             return tokens[index].TagType switch
@@ -105,7 +121,7 @@ namespace Markdown.TokenParser.Helpers
 
         private static bool IsBoldOrItalicBetweenWordsClosed(List<Token> tokens, int index)
         {
-            return tokens.NextTokenIs(TokenType.WhiteSpace, index) &&
+            return  (tokens.NextTokenIs(TokenType.WhiteSpace, index) || index + 1 >= tokens.Count) &&
                    tokens.LastTokenIs(TokenType.Text, index);
         }
 
@@ -117,14 +133,5 @@ namespace Markdown.TokenParser.Helpers
         }
 
         #endregion
-
-        //private static bool IsNearNumber(List<Token> tokens, int index)
-        //{
-        //    return index - 1 >= 0 && index + 1 < tokens.Count &&
-        //           (tokens[index - 1].TokenType is TokenType.Number &&
-        //            tokens[index + 1].TokenType is not TokenType.WhiteSpace ||
-        //            tokens[index + 1].TokenType is TokenType.Number &&
-        //            tokens[index - 1].TokenType is not TokenType.WhiteSpace);
-        //}
     }
 }

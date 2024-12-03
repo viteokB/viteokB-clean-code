@@ -104,7 +104,7 @@ namespace Markdown.TokenParser.ConcreteParser
                 {
                     openTagsPositions.Push(index);
                 }
-                else
+                else if(TokenValidator.IsTokenTagClosed(token.TagType, tokens, index))
                 {
                     // Если это закрывающий тег
                     if (openTagsPositions.TryPop(out var lastOpenTokenIndex))
@@ -117,6 +117,11 @@ namespace Markdown.TokenParser.ConcreteParser
                         incorrectTags.Add(token);
                     }
                 }
+                // else
+                // {
+                //     // Если не нашли соответствующий открывающий тег
+                //     incorrectTags.Add(token);
+                // }
             }
 
             // Добавляем оставшиеся открытые теги как некорректные
