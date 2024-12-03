@@ -1,10 +1,5 @@
-﻿using Markdown.Tags;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
+using Markdown.Tags;
 using Markdown.TokenParser.Helpers;
 using Markdown.Tokens;
 using MarkdownTests.TestData;
@@ -42,6 +37,14 @@ namespace MarkdownTests
 
         [TestCaseSource(typeof(TokenGeneratorTestsData), nameof(TokenGeneratorTestsData.LinesWithHeader))]
         public void TokenGenerator_GetTokensBySymbolCorrectly_WhenLineWithHeaders(string input, List<Token> expectedTokens)
+        {
+            var actuallyTokens = GetAllTokensFromLine(input);
+
+            actuallyTokens.Should().BeEquivalentTo(expectedTokens);
+        }
+
+        [TestCaseSource(typeof(TokenGeneratorTestsData), nameof(TokenGeneratorTestsData.LinesWithBulletedList))]
+        public void TokenGenerator_GetTokensBySymbolCorrectly_WhenLineWithBulletedLis(string input, List<Token> expectedTokens)
         {
             var actuallyTokens = GetAllTokensFromLine(input);
 

@@ -1,8 +1,5 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
-using Markdown.Tags;
-using Markdown.Tokens;
-using System.Text;
+﻿using Markdown.Tokens;
+using System.Reflection;
 
 namespace Markdown.TokenParser.Helpers
 {
@@ -20,9 +17,6 @@ namespace Markdown.TokenParser.Helpers
             }
 
             return null;
-            // return generateRuleClasses
-            //     .Select(t => t.GetToken(line, currentIndex))
-            //     .SingleOrDefault(t => t != null);
         }
 
         private static IEnumerable<ITokenGenerateRule> GetRuleClasses()

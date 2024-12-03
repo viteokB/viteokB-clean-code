@@ -1,10 +1,5 @@
 ﻿using Markdown.Tags;
 using Markdown.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MarkdownTests.TestData
 {
@@ -74,6 +69,38 @@ namespace MarkdownTests.TestData
                 new Token(TokenType.WhiteSpace, " ", TagType.UnDefined),
                 new Token(TokenType.MdTag, "# ", TagType.Header, true),
                 new Token(TokenType.MdTag, "# ", TagType.Header, true),
+            });
+        }
+
+        public static IEnumerable<TestCaseData> LinesWithBulletedList()
+        {
+            yield return new TestCaseData("* Заголовок", new List<Token>()
+            {
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+                new Token(TokenType.Text, "Заголовок", TagType.UnDefined),
+            });
+
+            yield return new TestCaseData("* * * ", new List<Token>()
+            {
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+            });
+
+            yield return new TestCaseData(@" * * ", new List<Token>()
+            {
+                new Token(TokenType.WhiteSpace, " ", TagType.UnDefined),
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+            });
+
+            yield return new TestCaseData(@"* раз * два", new List<Token>()
+            {
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
+                new Token(TokenType.Text, "раз", TagType.UnDefined),
+                new Token(TokenType.WhiteSpace, " ", TagType.UnDefined),
+                new Token(TokenType.Text, "два", TagType.UnDefined),
+                new Token(TokenType.MdTag, "* ", TagType.BulletedList, true),
             });
         }
 

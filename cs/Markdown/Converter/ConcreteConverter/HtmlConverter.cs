@@ -1,4 +1,5 @@
 ﻿using Markdown.Tags;
+using Markdown.Tags.ConcreteTags;
 using System.Text;
 
 namespace Markdown.Converter.ConcreteConverter
@@ -9,8 +10,24 @@ namespace Markdown.Converter.ConcreteConverter
         {
             var sb = new StringBuilder();
 
+            var containList = false;
+            var startedLine = true;
             foreach (var text in parsedLines)
             {
+                if (!startedLine)
+                    sb.Append('\n');
+
+                if (containList && text.Tags.FirstOrDefault() is not BulletTag)
+                {
+                    containList = false;
+                    sb.Append("</ul>");
+                }
+                else if (!containList && text.Tags.FirstOrDefault() is BulletTag)
+                {
+                    containList = true;
+                    sb.Append("<ul>");
+                }
+
                 var prevTagPos = 0;
                 foreach (var tag in text.Tags)
                 {
@@ -25,7 +42,10 @@ namespace Markdown.Converter.ConcreteConverter
                 sb.Append(text.Line.AsSpan(prevTagPos, text.Line.Length - prevTagPos));
                 if (text.Tags.Count > 0 && text.Tags[0].TagType == TagType.Header)
                     sb.Append(text.Tags[0].CloseTag);
+                startedLine = false;
             }
+            if (containList)
+                sb.Append("</ul>");
 
             return sb.ToString();
         }

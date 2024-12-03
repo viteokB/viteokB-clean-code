@@ -1,10 +1,5 @@
-﻿using Markdown.Tags.ConcreteTags;
-using Markdown.Tags;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Markdown.Tags;
+using Markdown.Tags.ConcreteTags;
 
 namespace MarkdownTests.TestData
 {
@@ -45,6 +40,15 @@ namespace MarkdownTests.TestData
             yield return new TestCaseData(@"_word bubo\_ bibo", "_word bubo_ bibo", new List<ITag>());
             yield return new TestCaseData(@"\_word bubo\_ bibo", "_word bubo_ bibo", new List<ITag>());
             yield return new TestCaseData("Why_1_ word 23 bubo bibo", "Why_1_ word 23 bubo bibo", new List<ITag>());
+        }
+
+        public static IEnumerable<TestCaseData> LinesWithBulletedList()
+        {
+            yield return new TestCaseData("* один", "один", new List<ITag>()
+            {
+                new BulletTag(0, false),
+            });
+            yield return new TestCaseData(@"\* один", @"* один", new List<ITag>());
         }
 
         public static IEnumerable<TestCaseData> LineWithBold()

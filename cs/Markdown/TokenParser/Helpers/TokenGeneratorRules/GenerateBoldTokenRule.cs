@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Markdown.Extensions;
 using Markdown.Tags;
 using Markdown.Tokens;
-using Markdown.Extensions;
 
 namespace Markdown.TokenParser.Helpers.TokenGeneratorRules
 {

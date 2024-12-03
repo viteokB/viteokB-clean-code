@@ -21,7 +21,7 @@ namespace Markdown.TokenParser.Helpers
         }
 
         private static bool lastOpenWasInWord;
-        
+
         public static bool IsTokenTagClosed(TagType tagType, List<Token> tokens, int index)
         {
             switch (tagType)
@@ -43,6 +43,7 @@ namespace Markdown.TokenParser.Helpers
                 TagType.Italic => IsValidItalic(tokens, index),
                 TagType.Bold => IsValidBold(tokens, index),
                 TagType.Header => IsValidHeader(tokens, index),
+                TagType.BulletedList => IsValidBulletedTag(tokens, index),
                 _ => true
             };
         }
@@ -53,6 +54,14 @@ namespace Markdown.TokenParser.Helpers
         }
 
         private static bool IsValidHeader(List<Token> tokens, int index)
+        {
+            if (index == 0 && index + 1 < tokens.Count && tokens[index].TokenType == TokenType.MdTag)
+                return true;
+
+            return false;
+        }
+
+        private static bool IsValidBulletedTag(List<Token> tokens, int index)
         {
             if (index == 0 && index + 1 < tokens.Count && tokens[index].TokenType == TokenType.MdTag)
                 return true;
@@ -94,7 +103,8 @@ namespace Markdown.TokenParser.Helpers
         private static bool IsBoldOrItalicBetweenWordsOpen(List<Token> tokens, int index)
         {
             return tokens.NextTokenIs(TokenType.Text, index) &&
-                   (index - 1 < 0 || tokens.LastTokenIs(TokenType.WhiteSpace, index)) ;
+                   (index - 1 < 0 || tokens.LastTokenIs(TokenType.WhiteSpace, index)
+                   || tokens.LastTokenIs(TokenType.MdTag, index));
         }
 
         //Является ли тег открывающим для ситуации когда тег применятеся внутри
@@ -121,8 +131,9 @@ namespace Markdown.TokenParser.Helpers
 
         private static bool IsBoldOrItalicBetweenWordsClosed(List<Token> tokens, int index)
         {
-            return  (tokens.NextTokenIs(TokenType.WhiteSpace, index) || index + 1 >= tokens.Count) &&
-                   tokens.LastTokenIs(TokenType.Text, index);
+            return (tokens.NextTokenIs(TokenType.WhiteSpace, index) || index + 1 >= tokens.Count) &&
+                   (tokens.LastTokenIs(TokenType.Text, index)
+                   || tokens.LastTokenIs(TokenType.MdTag, index));
         }
 
         private static bool IsBoldOrItalicInOneWordClosed(List<Token> tokens, int index)

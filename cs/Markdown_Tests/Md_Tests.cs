@@ -1,7 +1,7 @@
 using FluentAssertions;
+using Markdown;
 using Markdown.Converter.ConcreteConverter;
 using Markdown.TokenParser.ConcreteParser;
-using Markdown;
 
 
 namespace MarkdownTests
@@ -9,6 +9,31 @@ namespace MarkdownTests
     public class MdTests
     {
         private Md markdown = new Md(new LineParser(), new HtmlConverter());
+
+        #region BulletedTests
+
+        [TestCase("* один\n* два", "<ul><li>один</li>\n<li>два</li></ul>")]
+        [TestCase("* один", "<ul><li>один</li></ul>")]
+        public void Md_ShouldCreateBulletedListCorrectly_WhenBulletedItemNotEscaped(string input, string expected)
+        {
+            markdown.Render(input).Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(@"\* один", "* один")]
+        [TestCase("* один\n\\* два", "<ul><li>один</li>\n</ul>* два")]
+        public void Md_ShouldCreateBulletedListCorrectly_WhenBulletedItemEscaped(string input, string expected)
+        {
+            markdown.Render(input).Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(" * один\n * два", " * один\n * два")]
+        [TestCase("d* один\nd* два", "d* один\nd* два")]
+        public void Md_ShouldNotCreateBulletedTag_WhenAreCharsBeforeTag(string input, string expected)
+        {
+            markdown.Render(input).Should().BeEquivalentTo(expected);
+        }
+
+        #endregion
 
         #region HeaderTests
 
@@ -173,6 +198,20 @@ namespace MarkdownTests
         public void Md_ShouldCreateEmptyHtml_WhenTextIsStringEmpty(string input, string expected)
         {
             markdown.Render(String.Empty).Should().BeEquivalentTo(String.Empty);
+        }
+
+        public static IEnumerable<TestCaseData> MultiLinesTestCases()
+        {
+            yield return new TestCaseData("* _один вася_\n* __два петра__",
+                "<ul><li><em>один вася</em></li>\n<li><strong>два петра</strong></li></ul>");
+            yield return new TestCaseData("# заголовок\n* _один вася_\n* __два петра__",
+                "<h1>заголовок</h1>\n<ul><li><em>один вася</em></li>\n<li><strong>два петра</strong></li></ul>");
+        }
+
+        [TestCaseSource(nameof(MultiLinesTestCases))]
+        public void Md_ShouldRenderCorrectly_WhenTextWithMultiTags(string input, string expected)
+        {
+            markdown.Render(input).Should().BeEquivalentTo(expected);
         }
     }
 }

@@ -104,7 +104,7 @@ namespace Markdown.TokenParser.ConcreteParser
                 {
                     openTagsPositions.Push(index);
                 }
-                else if(TokenValidator.IsTokenTagClosed(token.TagType, tokens, index))
+                else /*if(TokenValidator.IsTokenTagClosed(token.TagType, tokens, index))*/
                 {
                     // Если это закрывающий тег
                     if (openTagsPositions.TryPop(out var lastOpenTokenIndex))
@@ -124,11 +124,10 @@ namespace Markdown.TokenParser.ConcreteParser
                 // }
             }
 
-            // Добавляем оставшиеся открытые теги как некорректные
             while (openTagsPositions.Count > 0)
             {
                 var token = tokens[openTagsPositions.Pop()];
-                if(!token.IsSelfCosingTag)
+                if (!token.IsSelfCosingTag)
                     incorrectTags.Add(token);
             }
 
@@ -163,7 +162,7 @@ namespace Markdown.TokenParser.ConcreteParser
             // Проверяем следующий тег после закрывающего
             if (TryGetNextTagType(tokens, closeIndex, out var nextTagTokenPosition))
             {
-                if (openTags.TryPeek(out var preOpenTagIndex) && 
+                if (openTags.TryPeek(out var preOpenTagIndex) &&
                     tokens[preOpenTagIndex].TagType == closeTagToken.TagType)
                 {
                     HandleNestedTags(openTags, tokens, preOpenTagIndex, openIndex, closeIndex, nextTagTokenPosition, incorrectTags);
@@ -280,6 +279,7 @@ namespace Markdown.TokenParser.ConcreteParser
                 TagType.Header => new HeaderTag(position, token.IsCloseTag),
                 TagType.Italic => new ItalicTag(position, token.IsCloseTag),
                 TagType.Bold => new BoldTag(position, token.IsCloseTag),
+                TagType.BulletedList => new BulletTag(position, token.IsCloseTag),
                 _ => throw new NotImplementedException()
             };
         }
