@@ -1,14 +1,15 @@
 ﻿using Markdown.Tags;
+using Markdown.TokenGeneratorClasses.Interfaces;
 using Markdown.Tokens;
 
-namespace Markdown.TokenParser.Helpers.TokenGeneratorRules;
+namespace Markdown.TokenGeneratorClasses.TokenGeneratorRules;
 
 public class GenerateBulletTokenRule : ITokenGenerateRule
 {
     public Token? GetToken(string line, int currentIndex)
     {
         if (currentIndex + 1 < line.Length && line[currentIndex] == '*' && line[currentIndex + 1] == ' ')
-            return new Token(TokenType.MdTag, "* ", TagType.BulletedList, true);
+            return new Token(TokenType.MdTag, "* ", currentIndex, false, TagType.BulletedListItem);
 
         return null;
     }

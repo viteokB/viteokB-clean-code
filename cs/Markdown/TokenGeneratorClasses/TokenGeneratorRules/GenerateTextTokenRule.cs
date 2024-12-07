@@ -1,7 +1,8 @@
 ﻿using Markdown.Tokens;
 using System.Text;
+using Markdown.TokenGeneratorClasses.Interfaces;
 
-namespace Markdown.TokenParser.Helpers.TokenGeneratorRules
+namespace Markdown.TokenGeneratorClasses.TokenGeneratorRules
 {
     public class GenerateTextTokenRule : ITokenGenerateRule
     {
@@ -42,7 +43,9 @@ namespace Markdown.TokenParser.Helpers.TokenGeneratorRules
                 currentIndex++;
             }
 
-            return new Token(tokenType, stringBuilder.ToString());
+            var text = stringBuilder.ToString();
+
+            return new Token(tokenType, text, currentIndex - text.Length);
         }
     }
 }

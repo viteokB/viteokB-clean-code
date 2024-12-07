@@ -4,25 +4,19 @@ namespace Markdown.Tokens
 {
     public class Token
     {
-        public TokenType TokenType;
+        public TokenType TokenType { get; set; }
+        public string Content { get; set; }
+        public TagType TagType { get; set; }
+        public bool IsCloseTag { get; set; }
+        public int Position { get; set; }
 
-        public readonly string Content;
-
-        public readonly TagType TagType;
-
-        public bool IsCloseTag;
-
-        public bool IsSelfCosingTag;
-
-        public int PairTagPosition;
-
-        public Token(TokenType tokenType, string content, TagType tagType = TagType.UnDefined, bool isSelfClosing = false)
+        public Token(TokenType tokenType, string content, int position, bool isCloseTag = false, TagType tagType = TagType.UnDefined)
         {
             TokenType = tokenType;
             Content = content;
+            Position = position;
+            IsCloseTag = isCloseTag;
             TagType = tagType;
-
-            IsSelfCosingTag = isSelfClosing;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Markdown.Tokens;
 
-namespace Markdown.TokenParser.Helpers
+namespace Markdown.TokenGeneratorClasses.Interfaces
 {
     public interface ITokenGenerateRule
     {

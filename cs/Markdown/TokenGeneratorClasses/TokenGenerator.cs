@@ -1,13 +1,14 @@
 ﻿using Markdown.Tokens;
 using System.Reflection;
+using Markdown.TokenGeneratorClasses.Interfaces;
 
-namespace Markdown.TokenParser.Helpers
+namespace Markdown.TokenGeneratorClasses
 {
-    public class TokenGenerator
+    public class TokenGenerator : ITokenGenerator
     {
         private static IEnumerable<ITokenGenerateRule> generateRuleClasses = GetRuleClasses();
 
-        public static Token? GetTokenBySymbol(string line, int currentIndex)
+        public static Token? GetToken(string line, int currentIndex)
         {
             foreach (var rule in generateRuleClasses)
             {
