@@ -40,8 +40,6 @@ namespace Markdown.Converter.ConcreteConverter
                 }
 
                 sb.Append(text.Line.AsSpan(prevTagPos, text.Line.Length - prevTagPos));
-                if (text.Tags.Count > 0 && text.Tags[0].TagType == TagType.Header)
-                    sb.Append(text.Tags[0].CloseTag);
                 startedLine = false;
             }
             if (containList)
