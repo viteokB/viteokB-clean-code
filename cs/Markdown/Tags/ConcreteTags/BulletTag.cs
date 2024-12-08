@@ -8,11 +8,7 @@ public class BulletTag : ITag
         IsCloseTag = isCloseTag;
     }
 
-    public TagType TagType { get; }
+    public TagType TagType => TagType.BulletedListItem;
     public int Position { get; set; }
     public bool IsCloseTag { get; set; }
-
-    public string OpenTag => "<li>";
-
-    public string CloseTag => "</li>";
 }

@@ -32,7 +32,9 @@ public class HtmlConverter : IConverter
             {
                 sb.Append(text.Line.AsSpan(prevTagPos, tag.Position - prevTagPos));
 
-                sb.Append(tag.IsCloseTag ? tag.CloseTag : tag.OpenTag);
+                sb.Append(tag.IsCloseTag ? 
+                    MdTagToHtmlConverter.CloseTags[tag.TagType] : 
+                    MdTagToHtmlConverter.OpenTags[tag.TagType]);
 
                 prevTagPos = tag.Position;
             }

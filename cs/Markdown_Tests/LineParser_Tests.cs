@@ -43,7 +43,7 @@ namespace MarkdownTests
         }
 
         [TestCaseSource(typeof(LineParserData), nameof(LineParserData.LinesWithBulletedList))]
-        public void ParseLine_ShoudBeCorrect_LinesWithBulletedList(string inLine, string expectedLine, List<ITag> tags)
+        public void ParseLine_ShoudBeCorrect_WhenLinesWithBulletedList(string inLine, string expectedLine, List<ITag> tags)
         {
             var parsedLines = parser.ParseLine(inLine);
 

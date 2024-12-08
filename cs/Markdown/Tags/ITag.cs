@@ -7,8 +7,4 @@ public interface ITag
     public int Position { get; protected set; }
 
     public bool IsCloseTag { get; protected set; }
-
-    public string OpenTag { get; }
-
-    public string CloseTag { get; }
 }

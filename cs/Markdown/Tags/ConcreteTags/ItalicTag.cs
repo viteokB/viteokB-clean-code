@@ -13,8 +13,4 @@ public class ItalicTag : ITag
     public int Position { get; set; }
 
     public bool IsCloseTag { get; set; }
-
-    public string OpenTag => "<em>";
-
-    public string CloseTag => "</em>";
 }

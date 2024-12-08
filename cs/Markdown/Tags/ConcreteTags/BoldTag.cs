@@ -13,8 +13,4 @@ public class BoldTag : ITag
     public int Position { get; set; }
 
     public bool IsCloseTag { get; set; }
-
-    public string OpenTag => "<strong>";
-
-    public string CloseTag => "</strong>";
 }
