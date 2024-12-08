@@ -1,22 +1,19 @@
 ﻿using Markdown.Tags;
 
-namespace Markdown
+namespace Markdown;
+
+public class ParsedLine
 {
-    public class ParsedLine
+    public readonly string Line;
+
+    public readonly List<ITag> Tags;
+
+    public ParsedLine(string line, List<ITag> tags)
     {
-        public readonly string Line;
+        if (tags.Any(x => x.Position > line.Length))
+            throw new ArgumentException("Позиция тега не может быть больше длины строки", nameof(tags));
 
-        public readonly List<ITag> Tags;
-
-        public ParsedLine(string line, List<ITag> tags)
-        {
-            var sortedTags = tags.OrderBy(x => x.Position).ToList();
-
-            if (sortedTags.Any(x => x.Position > line.Length))
-                throw new ArgumentException("Позиция тега не может быть больше длины строки", nameof(sortedTags));
-
-            this.Line = line;
-            this.Tags = sortedTags;
-        }
+        Line = line;
+        Tags = tags;
     }
 }

@@ -3,10 +3,10 @@
     public interface ITag
     {
         public TagType TagType { get; }
-        public int Position { get; protected set; }
-        public bool IsCloseTag { get; protected set; }
 
-        public bool IsAutoClosing { get; }
+        public int Position { get; protected set; }
+
+        public bool IsCloseTag { get; protected set; }
 
         public string OpenTag { get; }
 

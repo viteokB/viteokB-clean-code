@@ -8,13 +8,11 @@
 
         public bool IsCloseTag { get; set; }
 
-        public bool IsAutoClosing => true;
-
         public string OpenTag => "<h1>";
 
         public string CloseTag => "</h1>";
 
-        public HeaderTag(int position, bool isCloseTag)
+        public HeaderTag(int position, bool isCloseTag = false)
         {
             Position = position;
             IsCloseTag = isCloseTag;

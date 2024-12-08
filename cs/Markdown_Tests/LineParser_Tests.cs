@@ -1,13 +1,14 @@
 ﻿using FluentAssertions;
 using Markdown.Tags;
 using Markdown.TokenParser.ConcreteParser;
+using Markdown.TokenParser.Interfaces;
 using MarkdownTests.TestData;
 
 namespace MarkdownTests
 {
     public class LineParserTests
     {
-        private LineParser parser = new LineParser();
+        private ITokenLineParser parser = new LineParser();
 
         [Test]
         public void ParseLine_ThrowArgumentNullException_WhenArgumentIsNull()
@@ -53,6 +54,15 @@ namespace MarkdownTests
 
         [TestCaseSource(typeof(LineParserData), nameof(LineParserData.LineWithBold))]
         public void ParseLine_ShoudBeCorrect_WhenLineWithBoldTags(string inLine, string expectedLine, List<ITag> tags)
+        {
+            var parsedLines = parser.ParseLine(inLine);
+
+            parsedLines.Line.Should().BeEquivalentTo(expectedLine);
+            parsedLines.Tags.Should().BeEquivalentTo(tags);
+        }
+
+        [TestCaseSource(typeof(LineParserData), nameof(LineParserData.MultiTagsLine))]
+        public void ParseLine_ShoudBeCorrect_WhenLineWithMultiTags(string inLine, string expectedLine, List<ITag> tags)
         {
             var parsedLines = parser.ParseLine(inLine);
 

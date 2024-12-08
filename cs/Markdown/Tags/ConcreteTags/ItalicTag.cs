@@ -8,13 +8,11 @@
 
         public bool IsCloseTag { get; set; }
 
-        public bool IsAutoClosing => false;
-
         public string OpenTag => "<em>";
 
         public string CloseTag => "</em>";
 
-        public ItalicTag(int position, bool isCloseTag)
+        public ItalicTag(int position, bool isCloseTag = false)
         {
             Position = position;
             IsCloseTag = isCloseTag;

@@ -6,11 +6,11 @@ public class BulletTag : ITag
     public int Position { get; set; }
     public bool IsCloseTag { get; set; }
 
-    public bool IsAutoClosing => true;
     public string OpenTag => "<li>";
+
     public string CloseTag => "</li>";
 
-    public BulletTag(int position, bool isCloseTag)
+    public BulletTag(int position, bool isCloseTag = false)
     {
         Position = position;
         IsCloseTag = isCloseTag;

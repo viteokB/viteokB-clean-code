@@ -76,30 +76,30 @@ public static class TokenGeneratorTestsData
     {
         yield return new TestCaseData("* Заголовок", new List<Token>
         {
-            new(TokenType.MdTag, "* ", 0, false, TagType.BulletedList),
+            new(TokenType.MdTag, "* ", 0, false, TagType.BulletedListItem),
             new(TokenType.Text, "Заголовок", 2)
         });
 
         yield return new TestCaseData("* * * ", new List<Token>
         {
-            new(TokenType.MdTag, "* ", 0, false, TagType.BulletedList),
-            new(TokenType.MdTag, "* ", 2, false, TagType.BulletedList),
-            new(TokenType.MdTag, "* ", 4, false, TagType.BulletedList)
+            new(TokenType.MdTag, "* ", 0, false, TagType.BulletedListItem),
+            new(TokenType.MdTag, "* ", 2, false, TagType.BulletedListItem),
+            new(TokenType.MdTag, "* ", 4, false, TagType.BulletedListItem)
         });
 
         yield return new TestCaseData(@" * * ", new List<Token>
         {
             new(TokenType.WhiteSpace, " ", 0),
-            new(TokenType.MdTag, "* ", 1, false, TagType.BulletedList),
-            new(TokenType.MdTag, "* ", 3, false, TagType.BulletedList)
+            new(TokenType.MdTag, "* ", 1, false, TagType.BulletedListItem),
+            new(TokenType.MdTag, "* ", 3, false, TagType.BulletedListItem)
         });
 
         yield return new TestCaseData(@"* раз * два", new List<Token>
         {
-            new(TokenType.MdTag, "* ", 0, false, TagType.BulletedList),
+            new(TokenType.MdTag, "* ", 0, false, TagType.BulletedListItem),
             new(TokenType.Text, "раз", 2),
             new(TokenType.WhiteSpace, " ", 5),
-            new(TokenType.MdTag, "* ", 6, false, TagType.BulletedList),
+            new(TokenType.MdTag, "* ", 6, false, TagType.BulletedListItem),
             new(TokenType.Text, "два", 8)
         });
     }

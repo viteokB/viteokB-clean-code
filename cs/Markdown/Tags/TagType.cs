@@ -5,7 +5,7 @@
         Header,
         Italic,
         Bold,
-        BulletedList,
+        BulletedListItem,
         Escape,
         UnDefined
     }

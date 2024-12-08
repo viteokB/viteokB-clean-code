@@ -1,36 +1,43 @@
 ﻿using Markdown.Tags;
 using Markdown.Tags.ConcreteTags;
-using Markdown.TokenParser.Helpers;
 using Markdown.Tokens;
 using System.Text;
+using Markdown.Extensions;
+using Markdown.TokenGeneratorClasses;
+using Markdown.TokenParser.Interfaces;
+using Markdown.TokenParser.TagsGenerators;
+using Markdown.TokenParser.TokenHandlers;
 
 namespace Markdown.TokenParser.ConcreteParser
 {
-    public class LineParser : ILineParser
+    public class LineParser : ITokenLineParser
     {
         public ParsedLine ParseLine(string line)
         {
-            if (line == null)
+            if(line is null)
                 throw new ArgumentNullException("String argument text must be not null");
 
-            var listTokens = GetTokens(line);
-            listTokens = EscapeTags(listTokens);
-            listTokens = EscapeInvalidTokens(listTokens);
-            listTokens = EscapeNonPairTokens(listTokens);
-            listTokens = EscapeWrongOrder(listTokens);
-            var parseLine = GetTagsAndCleanText(listTokens);
+            var lineTokens = GetTokensLine(line);
+            var escapedTokens = ResetPositions(EscapeTags(lineTokens));
+            var headerTags = new HeaderTokensHandler().HandleLine(escapedTokens);
+            var bulletedLITags = new BulletedLIHandler().HandleLine(escapedTokens);
+            var italicTags = new ItalicTokensHandler().HandleLine(escapedTokens);
+            var boldTags = new BoldTokensHandler().HandleLine(escapedTokens);
 
-            return parseLine;
+            var merged = MergeTokens(escapedTokens, headerTags, boldTags, italicTags, bulletedLITags);
+            ProcessTokensIntersecting(merged);
+
+            return GetTagsAndCleanText(merged);
         }
 
-        private List<Token> GetTokens(string line)
+        private List<Token> GetTokensLine(string line)
         {
             int position = 0;
             var result = new List<Token?>();
 
             while (position < line.Length)
             {
-                var token = TokenGenerator.GetTokenBySymbol(line, position);
+                var token = TokenGenerator.GetToken(line, position);
                 result.Add(token);
                 position += token.Content.Length;
             }
@@ -50,6 +57,7 @@ namespace Markdown.TokenParser.ConcreteParser
                     if (token.TokenType is TokenType.MdTag or TokenType.Escape)
                     {
                         token.TokenType = TokenType.Text;
+                        token.TagType = TagType.UnDefined;
                         previousToken = token;
                         result.Add(token);
                     }
@@ -78,179 +86,76 @@ namespace Markdown.TokenParser.ConcreteParser
             return result;
         }
 
-        private List<Token> EscapeInvalidTokens(List<Token> tokens) =>
-            tokens.Select((t, index) =>
-                    t.TokenType is not TokenType.MdTag || TokenValidator.IsValidTagToken(tokens, index)
-                        ? t
-                        : new Token(TokenType.Text, t.Content))
+        private List<Token> ResetPositions(List<Token> tokens)
+        {
+            var position = 0;
+
+            foreach (var token in tokens)
+            {
+                token.Position = position;
+                position += token.Content.Length;
+            }
+
+            return tokens;
+        }
+
+        private List<Token> MergeTokens(List<Token> allTokens, params List<Token>[] tokenLists)
+        {
+            var positionMap = new Dictionary<int, Token>();
+
+            foreach (var token in allTokens)
+            {
+                positionMap[token.Position] = token;
+            }
+
+            foreach (var tokenList in tokenLists)
+            {
+                foreach (var token in tokenList)
+                {
+                    positionMap[token.Position] = token;
+                }
+            }
+
+            // Преобразуем словарь обратно в список
+            var combinedTokens = positionMap.Values.ToList();
+
+            var combindedTokens = combinedTokens.OrderBy(token => token.Position)
                 .ToList();
 
-        private List<Token> EscapeNonPairTokens(List<Token> tokens)
+            return combinedTokens;
+        }
+
+        private void ProcessTokensIntersecting(List<Token> tokens)
         {
-            var resultTokens = new List<Token>();
-            var openTagsPositions = new Stack<int>();
-            var incorrectTags = new List<Token>();
+            var stack = new Stack<Token>();
+            var process = new List<Token>();
 
-            for (var index = 0; index < tokens.Count; index++)
+            foreach (var token in tokens)
             {
-                var token = tokens[index];
-                resultTokens.Add(token);
-
-                // Пропускаем токены, которые не являются тегами
-                if (token.TokenType != TokenType.MdTag) continue;
-
-                // Проверяем, является ли текущий токен открывающим тегом
-                if (TokenValidator.IsTokenTagOpen(token.TagType, tokens, index))
+                if (token.TagType == TagType.Italic || token.TagType == TagType.Bold)
                 {
-                    openTagsPositions.Push(index);
-                }
-                else /*if(TokenValidator.IsTokenTagClosed(token.TagType, tokens, index))*/
-                {
-                    // Если это закрывающий тег
-                    if (openTagsPositions.TryPop(out var lastOpenTokenIndex))
+                    process.Add(token);
+                    if (token.IsCloseTag)
                     {
-                        SolveOpenAndCloseTags(openTagsPositions, tokens, lastOpenTokenIndex, index, incorrectTags);
+                        stack.TryPeek(out var openToken);
+                        if (openToken != null && !openToken.IsCloseTag
+                                              && openToken.TagType == token.TagType)
+                        {
+                            process.Remove(stack.Pop());
+                            process.Remove(token);
+                        }
+                        else
+                            stack.Push(token);
                     }
                     else
-                    {
-                        // Если не нашли соответствующий открывающий тег
-                        incorrectTags.Add(token);
-                    }
-                }
-                // else
-                // {
-                //     // Если не нашли соответствующий открывающий тег
-                //     incorrectTags.Add(token);
-                // }
-            }
-
-            while (openTagsPositions.Count > 0)
-            {
-                var token = tokens[openTagsPositions.Pop()];
-                if (!token.IsSelfCosingTag)
-                    incorrectTags.Add(token);
-            }
-
-            ChangeTypesForIncorrectTokens(incorrectTags);
-
-            return resultTokens;
-        }
-
-        private void ChangeTypesForIncorrectTokens(List<Token> incorrectTags)
-        {
-            foreach (var token in incorrectTags)
-            {
-                token.TokenType = TokenType.Text; // Изменяем тип токена на текстовый
-            }
-        }
-
-        private void SolveOpenAndCloseTags(Stack<int> openTags, List<Token> tokens, int openIndex,
-           int closeIndex, List<Token> incorrectTags)
-        {
-            var openTagToken = tokens[openIndex];
-            var closeTagToken = tokens[closeIndex];
-            closeTagToken.IsCloseTag = true;
-
-            // Проверяем, совпадают ли типы открывающего и закрывающего тегов
-            if (openTagToken.TagType == closeTagToken.TagType)
-            {
-                tokens[openIndex].PairTagPosition = closeIndex;
-                tokens[closeIndex].PairTagPosition = openIndex;
-                return;
-            }
-
-            // Проверяем следующий тег после закрывающего
-            if (TryGetNextTagType(tokens, closeIndex, out var nextTagTokenPosition))
-            {
-                if (openTags.TryPeek(out var preOpenTagIndex) &&
-                    tokens[preOpenTagIndex].TagType == closeTagToken.TagType)
-                {
-                    HandleNestedTags(openTags, tokens, preOpenTagIndex, openIndex, closeIndex, nextTagTokenPosition, incorrectTags);
-                    return;
-                }
-
-                // Если следующий тег не является открывающим
-                if (!TokenValidator.IsTokenTagOpen(tokens[nextTagTokenPosition].TagType, tokens, nextTagTokenPosition))
-                {
-                    HandleIncorrectTag(openTags, tokens, openIndex, closeIndex, incorrectTags);
-                    return;
+                        stack.Push(token);
                 }
             }
-
-            // Если не удалось найти соответствующий открывающий тег
-            incorrectTags.Add(tokens[openIndex]);
-            incorrectTags.Add(tokens[closeIndex]);
-        }
-
-        private void HandleNestedTags(Stack<int> openTags, List<Token> tokens, int preOpenTagIndex,
-           int openIndex, int closeIndex, int nextTagTokenPosition, List<Token> incorrectTags)
-        {
-            // Обработка вложенных тегов
-            if (tokens[nextTagTokenPosition].TagType == tokens[openIndex].TagType)
+            foreach (var token in stack)
             {
-                openTags.Push(openIndex);
-                incorrectTags.Add(tokens[closeIndex]);
+                token.TagType = TagType.UnDefined;
+                token.TokenType = TokenType.Text;
             }
-            else
-            {
-                openTags.Pop();
-                tokens[preOpenTagIndex].PairTagPosition = closeIndex;
-                tokens[closeIndex].PairTagPosition = preOpenTagIndex;
-                incorrectTags.Add(tokens[openIndex]);
-            }
-        }
-
-        private void HandleIncorrectTag(Stack<int> openTags, List<Token> tokens,
-           int openIndex, int closeIndex, List<Token> incorrectTags)
-        {
-            // Обработка некорректных тегов
-            if (openTags.Count > 0)
-            {
-                var preOpenTagIndex = openTags.Pop();
-                incorrectTags.Add(tokens[preOpenTagIndex]);
-                incorrectTags.Add(tokens[openIndex]);
-                incorrectTags.Add(tokens[closeIndex]);
-            }
-            else
-            {
-                incorrectTags.Add(tokens[openIndex]);
-                incorrectTags.Add(tokens[closeIndex]);
-            }
-        }
-
-
-        private bool TryGetNextTagType(List<Token> tokens, int index, out int nextTagToken)
-        {
-            for (var i = index + 1; i < tokens.Count; i++)
-            {
-                if (tokens[i].TokenType is not TokenType.MdTag) continue;
-                nextTagToken = i;
-                return true;
-            }
-
-            nextTagToken = -1;
-            return false;
-        }
-
-        private List<Token> EscapeWrongOrder(List<Token> tokens)
-        {
-            var result = new List<Token>();
-            var openTags = new Stack<Token>();
-            foreach (var t in tokens)
-            {
-                result.Add(t);
-                if (t.TokenType is TokenType.MdTag && !t.IsCloseTag)
-                    openTags.Push(t);
-                else if (t.TokenType is TokenType.MdTag)
-                    openTags.Pop();
-                if (!TokenValidator.OrderIsCorrect(openTags, t))
-                {
-                    t.TokenType = TokenType.Text;
-                    tokens[t.PairTagPosition].TokenType = TokenType.Text;
-                }
-            }
-
-            return result;
         }
 
         private ParsedLine GetTagsAndCleanText(List<Token> tokens)
@@ -279,7 +184,7 @@ namespace Markdown.TokenParser.ConcreteParser
                 TagType.Header => new HeaderTag(position, token.IsCloseTag),
                 TagType.Italic => new ItalicTag(position, token.IsCloseTag),
                 TagType.Bold => new BoldTag(position, token.IsCloseTag),
-                TagType.BulletedList => new BulletTag(position, token.IsCloseTag),
+                TagType.BulletedListItem => new BulletTag(position, token.IsCloseTag),
                 _ => throw new NotImplementedException()
             };
         }
