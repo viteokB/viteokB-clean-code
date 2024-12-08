@@ -16,6 +16,14 @@ namespace MarkdownTests
             Assert.Throws<ArgumentNullException>(() => parser.ParseLine(null), "String argument text must be not null");
         }
 
+        [Test]
+        public void ParseLine_ShouldBeEmpty_WhenArgumentStringIsEmpty()
+        {
+            var parsedLine = parser.ParseLine(String.Empty);
+            parsedLine.Line.Should().BeEmpty();
+            parsedLine.Tags.Should().BeEmpty();
+        }
+
         [TestCaseSource(typeof(LineParserData), nameof(LineParserData.WordsOnlyLines))]
         public void ParseLine_ShoudBeCorrect_WhenLineWithWordsOnly(string inLine, string expectedLine, List<ITag> tags)
         {

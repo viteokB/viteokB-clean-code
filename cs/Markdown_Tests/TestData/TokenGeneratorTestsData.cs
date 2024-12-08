@@ -108,20 +108,20 @@ public static class TokenGeneratorTestsData
     {
         yield return new TestCaseData(@"\", new List<Token>
         {
-            new(TokenType.Escape, @"\", 0, false, TagType.Escape)
+            new(TokenType.Escape, @"\", 0)
         });
 
         yield return new TestCaseData(@"\\", new List<Token>
         {
-            new(TokenType.Escape, @"\", 0, false, TagType.Escape),
-            new(TokenType.Escape, @"\", 1, false,TagType.Escape)
+            new(TokenType.Escape, @"\", 0),
+            new(TokenType.Escape, @"\", 1)
         });
 
         yield return new TestCaseData(@"\\\", new List<Token>
         {
-            new(TokenType.Escape, @"\", 0, false, TagType.Escape),
-            new(TokenType.Escape, @"\", 1, false,TagType.Escape),
-            new(TokenType.Escape, @"\", 2, false,TagType.Escape),
+            new(TokenType.Escape, @"\", 0),
+            new(TokenType.Escape, @"\", 1),
+            new(TokenType.Escape, @"\", 2),
         });
     }
 
@@ -181,7 +181,7 @@ public static class TokenGeneratorTestsData
 
         yield return new TestCaseData(@"\# word", new List<Token>
         {
-            new(TokenType.Escape, @"\", 0, false, TagType.Escape),
+            new(TokenType.Escape, @"\", 0),
             new(TokenType.MdTag, "# ", 1, false, TagType.Header),
             new(TokenType.Text, "word", 3)
         });

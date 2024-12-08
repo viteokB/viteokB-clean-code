@@ -1,53 +1,48 @@
-﻿using Markdown.Tags;
+﻿using Markdown.Extensions;
+using Markdown.Tags;
 using Markdown.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Markdown.Extensions;
 
-namespace Markdown.TokenParser.TokenHandlers
+namespace Markdown.TokenParser.TokenHandlers;
+
+public class BulletedLIHandler
 {
-    public class BulletedLIHandler
+    public List<Token> HandleLine(List<Token> line)
     {
-        public List<Token> HandleLine(List<Token> line)
-        {
-            var result = new List<Token>();
-            var position = 0;
-            var addCloseTag = false;
+        var result = new List<Token>();
+        var position = 0;
+        var addCloseTag = false;
 
-            for (var j = 0; j < line.Count; j++)
+        for (var j = 0; j < line.Count; j++)
+        {
+            if (IsBulletedListItem(line, j) && line[j].TagType == TagType.BulletedListItem)
             {
-                if (IsBulletedListItem(line, j) && line[j].TagType == TagType.BulletedListItem)
-                {
-                    result.Add(new Token(TokenType.MdTag, "* ",
-                        position, false, TagType.BulletedListItem));
+                result.Add(new Token(TokenType.MdTag, "* ",
+                    position, false, TagType.BulletedListItem));
 
-                    addCloseTag = true;
-                }
-                else if (line[j].TagType == TagType.BulletedListItem)
-                {
-                    result.Add(new Token(TokenType.Text, "* ", position));
-                }
-
-                position += line[j].Content.Length;
+                addCloseTag = true;
             }
-            if (addCloseTag)
-                result.Add(CreateCloseTag(position));
+            else if (line[j].TagType == TagType.BulletedListItem)
+            {
+                result.Add(new Token(TokenType.Text, "* ", position));
+            }
 
-
-            return result;
+            position += line[j].Content.Length;
         }
 
-        private bool IsBulletedListItem(List<Token> tokens, int index)
-        {
-            return index == 0 && tokens.CurrentTokenIs(TagType.BulletedListItem, index);
-        }
+        if (addCloseTag)
+            result.Add(CreateCloseTag(position));
 
-        private Token CreateCloseTag(int lastIndex)
-        {
-            return new Token(TokenType.MdTag, "", lastIndex + 1, true, TagType.BulletedListItem);
-        }
+
+        return result;
+    }
+
+    private bool IsBulletedListItem(List<Token> tokens, int index)
+    {
+        return index == 0 && tokens.CurrentTokenIs(TagType.BulletedListItem, index);
+    }
+
+    private Token CreateCloseTag(int lastIndex)
+    {
+        return new Token(TokenType.MdTag, "", lastIndex + 1, true, TagType.BulletedListItem);
     }
 }

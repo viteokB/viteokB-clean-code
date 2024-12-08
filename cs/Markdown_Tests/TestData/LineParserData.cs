@@ -32,10 +32,36 @@ namespace MarkdownTests.TestData
                 new ItalicTag(0, false),
                 new ItalicTag(9, true),
             });
+            yield return new TestCaseData("_word bu_bo bibo", "_word bu_bo bibo", new List<ITag>()
+            {
+            });
+            yield return new TestCaseData("wo_rd bubo_ bibo", "wo_rd bubo_ bibo", new List<ITag>()
+            {
+            });
+            yield return new TestCaseData("wo_rd bu_bo bibo", "wo_rd bu_bo bibo", new List<ITag>()
+            {
+            });
             yield return new TestCaseData("_wo_rd bubo bibo", "word bubo bibo", new List<ITag>()
             {
                 new ItalicTag(0, false),
                 new ItalicTag(2, true),
+            });
+            yield return new TestCaseData("_word __bubo__ bibo_", "word bubo bibo", new List<ITag>()
+            {
+                new ItalicTag(0, false),
+                new BoldTag(5, false),
+                new BoldTag(9, true),
+                new ItalicTag(14, true),
+            });
+            yield return new TestCaseData("l_ov_e", "love", new List<ITag>()
+            {
+                new ItalicTag(1, false),
+                new ItalicTag(3, true),
+            });
+            yield return new TestCaseData("l_ove_", "love", new List<ITag>()
+            {
+                new ItalicTag(1, false),
+                new ItalicTag(4, true),
             });
             yield return new TestCaseData("_word __bubo_ bibo__", "_word __bubo_ bibo__", new List<ITag>());
             yield return new TestCaseData(@"\_word bubo_ bibo", "_word bubo_ bibo", new List<ITag>());
@@ -72,10 +98,36 @@ namespace MarkdownTests.TestData
                 new BoldTag(0, false),
                 new BoldTag(9, true),
             });
+            yield return new TestCaseData("__word bu__bo bibo", "__word bu__bo bibo", new List<ITag>()
+            {
+            });
+            yield return new TestCaseData("wo__rd bubo__ bibo", "wo__rd bubo__ bibo", new List<ITag>()
+            {
+            });
+            yield return new TestCaseData("wo__rd bu__bo bibo", "wo__rd bu__bo bibo", new List<ITag>()
+            {
+            });
             yield return new TestCaseData("__wo__rd bubo bibo", "word bubo bibo", new List<ITag>()
             {
                 new BoldTag(0, false),
                 new BoldTag(2, true),
+            });
+            yield return new TestCaseData("__word _bubo_ bibo__", "word bubo bibo", new List<ITag>()
+            {
+                new BoldTag(0, false),
+                new ItalicTag(5, false),
+                new ItalicTag(9, true),
+                new BoldTag(14, true)
+            });
+            yield return new TestCaseData("l__ov__e", "love", new List<ITag>()
+            {
+                new BoldTag(1, false),
+                new BoldTag(3, true),
+            });
+            yield return new TestCaseData("l__ove__", "love", new List<ITag>()
+            {
+                new BoldTag(1, false),
+                new BoldTag(4, true),
             });
             yield return new TestCaseData("_word __bubo_ bibo__", "_word __bubo_ bibo__", new List<ITag>());
             yield return new TestCaseData(@"\__word bubo__ bibo", "__word bubo__ bibo", new List<ITag>());

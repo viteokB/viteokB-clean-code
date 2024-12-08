@@ -12,16 +12,26 @@ public class BoldTokensHandler : ITokenHandler
         var result = new List<Token>();
         var opened = new List<Token>(1);
         var position = 0;
+        Func<List<Token>, int, bool> isClosed = (list, i) => false;
 
         for (var j = 0; j < line.Count; j++)
         {
             if (opened.Count == 0 && IsOpen(j, line))
             {
-                var token = line[j];
-                opened.Add(new Token(TokenType.MdTag, "__",
-                    position, false, TagType.Bold));
+                if (IsOpenInWord(j, line))
+                {
+                    var token = line[j];
+                    isClosed = (list, index) => IsCloseInWord(index, list, token);
+                    opened.Add(line[j]);
+                }
+                else if (IsOpenBetweenWords(j, line))
+                {
+                    var token = line[j];
+                    isClosed = (list, i) => IsClosed(i, list, token);
+                    opened.Add(line[j]);
+                }
             }
-            else if (opened.Count > 0 && IsClosed(j, line))
+            else if (opened.Count > 0 && isClosed(line, j))
             {
                 result.Add(opened[0]);
                 result.Add(new Token(TokenType.MdTag, "__",
@@ -52,19 +62,42 @@ public class BoldTokensHandler : ITokenHandler
     {
         var isFirstInLine = IsFirstInLine(index, tokens);
         var isOpenOrdinary = IsOpenOrdinary(index, tokens);
-        var isOpenClosed = IsOpenClosed(index, tokens);
+        var isOpenClosed = IsInWord(index, tokens);
 
-        return isFirstInLine ^ isOpenOrdinary ^ isOpenClosed;
+        return isFirstInLine || isOpenOrdinary || isOpenClosed;
     }
 
-    private bool IsClosed(int index, List<Token> tokens)
+    private bool IsClosed(int index, List<Token> tokens, Token token)
     {
         var isLastInLine = IsLastInLine(index, tokens);
         var isClosedOrdinary = IsClosedOrdinary(index, tokens);
-        var isOpenClosed = IsOpenClosed(index, tokens);
+        var isOpenClosed = IsCloseInWord(index, tokens, token);
 
-        return isLastInLine ^ isClosedOrdinary ^ isOpenClosed;
+        return isLastInLine || isClosedOrdinary || isOpenClosed;
     }
+
+    private bool IsOpenBetweenWords(int index, List<Token> tokens)
+    {
+        return IsOpenOrdinary(index, tokens) ^ IsFirstInLine(index, tokens);
+    }
+
+    private bool IsOpenInWord(int index, List<Token> tokens)
+    {
+        return IsInWord(index, tokens);
+    }
+
+    private bool IsCloseBetweenWords(int index, List<Token> tokens)
+    {
+        return IsClosedOrdinary(index, tokens) ^ IsLastInLine(index, tokens);
+    }
+
+    private bool IsCloseInWord(int index, List<Token> tokens, Token openToken)
+    {
+        return index - 2 > -1 && (IsInWord(index, tokens) || IsCloseBetweenWords(index, tokens))
+                              && tokens[index - 2] == openToken;
+    }
+
+    #region OpenSituations
 
     /// <summary>
     ///     Определяет является ли токен одновременно и
@@ -74,14 +107,12 @@ public class BoldTokensHandler : ITokenHandler
     /// <param name="index">Индекс токена</param>
     /// <param name="tokens">Список токенов для проверки</param>
     /// <returns>true если тег внутри слова иначе false</returns>
-    private bool IsOpenClosed(int index, List<Token> tokens)
+    private bool IsInWord(int index, List<Token> tokens)
     {
         return tokens.LastTokenIs(TokenType.Text, index) &&
                tokens.CurrentTokenIs(TagType.Bold, index) &
                tokens.NextTokenIs(TokenType.Text, index);
     }
-
-    #region OpenSituations
 
     private bool IsFirstInLine(int index, List<Token> tokens)
     {

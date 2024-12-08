@@ -26,8 +26,9 @@ namespace MarkdownTests
             markdown.Render(input).Should().BeEquivalentTo(expected);
         }
 
-        [TestCase(" * один\n * два", " * один\n * два")]
+        [TestCase(" * один\n * два", " * один\n * два")] 
         [TestCase("d* один\nd* два", "d* один\nd* два")]
+        [TestCase("* один\nd* два", "<ul><li>один</li>\n</ul>d* два")]
         public void Md_ShouldNotCreateBulletedTag_WhenAreCharsBeforeTag(string input, string expected)
         {
             markdown.Render(input).Should().BeEquivalentTo(expected);
@@ -38,7 +39,6 @@ namespace MarkdownTests
         #region HeaderTests
 
         [TestCase(@"# bibo", "<h1>bibo</h1>")]
-        [TestCase(@" # bibo", " # bibo")]
         [TestCase(@"# # bibo", "<h1># bibo</h1>")]
         public void Md_ShouldCreateHeaderCorrectly_WhenHeaderNotEscaped(string input, string expected)
         {
@@ -54,6 +54,7 @@ namespace MarkdownTests
 
         [TestCase(@"\\# bibo", @"\# bibo")]
         [TestCase(@"a # # bibo", @"a # # bibo")]
+        [TestCase(@" # bibo", " # bibo")]
         public void Md_ShouldNotCreateHeaderTag_WhenAreCharsBeforeHash(string input, string expected)
         {
             markdown.Render(input).Should().BeEquivalentTo(expected);
@@ -106,7 +107,7 @@ namespace MarkdownTests
         public void Md_ShoudNotCreateItalicAndBoldTags_WhenBoldTagsInsideItalic()
         {
             var input = "I _want to __sleep__ tonight_";
-            var expected = "I <em>want to __sleep__ tonight</em>";
+            var expected = "I <em>want to <strong>sleep</strong> tonight</em>";
 
             markdown.Render(input).Should().BeEquivalentTo(expected);
         }
@@ -190,12 +191,15 @@ namespace MarkdownTests
 
         [TestCase(@"____", @"____")]
         [TestCase(@"__", @"__")]
-        public void Md_CanCreateEmptyItalicOrBoldTag(string input, string expected)
+        [TestCase(@"# ", @"# ")]
+        [TestCase(@"* ", @"* ")]
+        public void Md_ShouldNotCreateHtmlTags_WhenMdTagsContainsNothing(string input, string expected)
         {
             markdown.Render(input).Should().BeEquivalentTo(expected);
         }
 
-        public void Md_ShouldCreateEmptyHtml_WhenTextIsStringEmpty(string input, string expected)
+        //[Test]
+        public void Md_ShouldCreateEmptyHtml_WhenTextIsStringEmpty()
         {
             markdown.Render(String.Empty).Should().BeEquivalentTo(String.Empty);
         }

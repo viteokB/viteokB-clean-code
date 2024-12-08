@@ -1,12 +1,10 @@
-﻿namespace Markdown.Tags
+﻿namespace Markdown.Tags;
+
+public enum TagType
 {
-    public enum TagType
-    {
-        Header,
-        Italic,
-        Bold,
-        BulletedListItem,
-        Escape,
-        UnDefined
-    }
+    Header,
+    Italic,
+    Bold,
+    BulletedListItem,
+    UnDefined
 }

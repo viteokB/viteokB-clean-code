@@ -29,7 +29,8 @@ public class HeaderTokensHandler : ITokenHandler
 
             position += line[j].Content.Length;
         }
-        if(addCloseTag)
+
+        if (addCloseTag)
             result.Add(CreateCloseTag(position));
 
 

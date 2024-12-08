@@ -1,15 +1,14 @@
-﻿namespace Markdown.Tags
+﻿namespace Markdown.Tags;
+
+public interface ITag
 {
-    public interface ITag
-    {
-        public TagType TagType { get; }
+    public TagType TagType { get; }
 
-        public int Position { get; protected set; }
+    public int Position { get; protected set; }
 
-        public bool IsCloseTag { get; protected set; }
+    public bool IsCloseTag { get; protected set; }
 
-        public string OpenTag { get; }
+    public string OpenTag { get; }
 
-        public string CloseTag { get; }
-    }
+    public string CloseTag { get; }
 }

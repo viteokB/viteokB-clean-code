@@ -1,11 +1,10 @@
-﻿namespace Markdown.Tokens
+﻿namespace Markdown.Tokens;
+
+public enum TokenType
 {
-    public enum TokenType
-    {
-        MdTag,
-        Text,
-        Number,
-        Escape,
-        WhiteSpace
-    }
+    MdTag,
+    Text,
+    Number,
+    Escape,
+    WhiteSpace
 }
